@@ -1,0 +1,38 @@
+FROM ubuntu:16.04
+
+RUN apt-get -y update \
+ && apt-get -y install \
+    build-essential \
+    sudo nano git less \
+    python2.7 python2.7-dev python-pip \
+    unzip \
+    python-serial \
+    bsdmainutils \
+ && apt-get clean \
+ && rm -rf /var/cache/apt/archives/*
+
+RUN apt-get -y install binutils-arm-none-eabi gcc-arm-none-eabi arduino-core arduino-mk libusb-dev
+
+RUN cd /usr/share/arduino/hardware/tools \
+ && sudo mkdir arm \
+ && cd arm \
+ && sudo ln -s ../../../../../bin \
+ && sudo ln -s ../../../../../lib
+
+RUN cd /usr/share/arduino/hardware/ \
+ && sudo mkdir teensy \
+ && cd teensy \
+ && sudo git clone https://github.com/PaulStoffregen/cores
+
+COPY boards.txt /usr/share/arduino/hardware/teensy/
+
+RUN cd /tmp/ \
+ && git clone https://github.com/PaulStoffregen/teensy_loader_cli.git \
+ && cd teensy_loader_cli \
+ && make \
+ && mv teensy_loader_cli /usr/local/bin
+
+# RUN cd /tmp/ \
+#  && git clone https://github.com/ARM-software/CMSIS_5.git
+
+
